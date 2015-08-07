@@ -1,0 +1,5 @@
+Log file created at: 2015/07/29 16:46:12
+Running on machine: zhounan-Presario-CQ42-Notebook-PC
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I0729 16:46:12.938539 25301 plsa.cpp:42] init plsa model
+F0729 16:46:14.029414 25301 util.cpp:39] dict path is wrong

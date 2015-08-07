@@ -1,0 +1,1 @@
+/usr/bin/c++    -g   -Wall -O2   CMakeFiles/plsa_train.dir/plsa_train.o CMakeFiles/plsa_train.dir/util.o CMakeFiles/plsa_train.dir/plsa.o  -o plsa_train  -L../lib -rdynamic -ltinyxml -Wl,-Bstatic -lglog -Wl,-Bdynamic -lpthread -Wl,-rpath,../lib 
