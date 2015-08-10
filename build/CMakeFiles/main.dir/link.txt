@@ -1,1 +1,0 @@
-/usr/bin/c++    -g   -Wall -O2   CMakeFiles/main.dir/main.o CMakeFiles/main.dir/util.o CMakeFiles/main.dir/plsa.o  -o main  -L../lib -rdynamic -ltinyxml -Wl,-Bstatic -lglog -Wl,-Bdynamic -lpthread -Wl,-rpath,../lib 
