@@ -9,6 +9,7 @@
 PY_HOME=./scripts
 PROJECT_HOME=/home/zhounan/project/ict/plsa/plsa
 ROOT_DIR=/home/zhounan/corpus/sogou_part #语料库文件夹地址
+TRAIN_CORPUS=/home/zhounan/corpus/sogou_corpus #语料文件
 TEST_DIR=/home/zhounan/corpus/sogou_test #测试语料地址
 STOP_WORDS_PATH=/home/zhounan/corpus/stop_words #停用词表地址
 DICT_PATH=$PROJECT_HOME/data/words_tf #生成的字典地址
@@ -17,7 +18,7 @@ TRAIN_PATH=$PROJECT_HOME/build/ #训练程序路径
 DOC_PLSA=$PROJECT_HOME/data/doc_probs #PLSA文档话题分布
 TERM_PLSA=$PROJECT_HOME/data/term_probs #PLSA词项话题分布
 TOPIC_NUM=10 #话题数
-TOPIC_ID=5 #要查看的话题id
+TOPIC_ID=4 #要查看的话题id
 RESULT_PATH=$PROJECT_HOME/data #存储展示结果的路径
 
 function gen_dict()
@@ -32,7 +33,7 @@ function prep()
 {
 	cd $PY_HOME
 	echo `pwd`
-	python prep.py $ROOT_DIR $DICT_PATH > $TRAIN_FILE_PATH
+	python prep.py $TRAIN_CORPUS $DICT_PATH > $TRAIN_FILE_PATH
 }
 
 
@@ -48,7 +49,7 @@ function show_topic_docs()
 {
 	cd $PY_HOME
 	echo `pwd`
-	python show_result.py $ROOT_DIR $DOC_PLSA $TOPIC_NUM $TOPIC_ID > $RESULT_PATH/${TOPIC_ID}_docs
+	python show_result.py $TRAIN_CORPUS $DOC_PLSA $TOPIC_NUM $TOPIC_ID > $RESULT_PATH/${TOPIC_ID}_docs
 }
 
 

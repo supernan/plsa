@@ -6,11 +6,11 @@
 
 #IncludeRegexTransform: 
 
-/home/zhounan/develop/cpp/plsa/src/../include/const.h
+/home/zhounan/project/ict/plsa/plsa/src/../include/const.h
 
-/home/zhounan/develop/cpp/plsa/src/../include/glog/log_severity.h
+/home/zhounan/project/ict/plsa/plsa/src/../include/glog/log_severity.h
 
-/home/zhounan/develop/cpp/plsa/src/../include/glog/logging.h
+/home/zhounan/project/ict/plsa/plsa/src/../include/glog/logging.h
 errno.h
 -
 string.h
@@ -38,15 +38,15 @@ inttypes.h
 gflags/gflags.h
 -
 glog/log_severity.h
-/home/zhounan/develop/cpp/plsa/src/../include/glog/glog/log_severity.h
+/home/zhounan/project/ict/plsa/plsa/src/../include/glog/glog/log_severity.h
 glog/vlog_is_on.h
-/home/zhounan/develop/cpp/plsa/src/../include/glog/glog/vlog_is_on.h
+/home/zhounan/project/ict/plsa/plsa/src/../include/glog/glog/vlog_is_on.h
 
-/home/zhounan/develop/cpp/plsa/src/../include/glog/vlog_is_on.h
+/home/zhounan/project/ict/plsa/plsa/src/../include/glog/vlog_is_on.h
 glog/log_severity.h
-/home/zhounan/develop/cpp/plsa/src/../include/glog/glog/log_severity.h
+/home/zhounan/project/ict/plsa/plsa/src/../include/glog/glog/log_severity.h
 
-/home/zhounan/develop/cpp/plsa/src/../include/plsa.h
+/home/zhounan/project/ict/plsa/plsa/src/../include/plsa.h
 iostream
 -
 map
@@ -54,23 +54,23 @@ map
 math.h
 -
 util.h
-/home/zhounan/develop/cpp/plsa/src/../include/util.h
+/home/zhounan/project/ict/plsa/plsa/src/../include/util.h
 const.h
-/home/zhounan/develop/cpp/plsa/src/../include/const.h
+/home/zhounan/project/ict/plsa/plsa/src/../include/const.h
 tinyxml.h
-/home/zhounan/develop/cpp/plsa/src/../include/tinyxml.h
+/home/zhounan/project/ict/plsa/plsa/src/../include/tinyxml.h
 tinystr.h
-/home/zhounan/develop/cpp/plsa/src/../include/tinystr.h
+/home/zhounan/project/ict/plsa/plsa/src/../include/tinystr.h
 time.h
 -
 
-/home/zhounan/develop/cpp/plsa/src/../include/tinystr.h
+/home/zhounan/project/ict/plsa/plsa/src/../include/tinystr.h
 assert.h
 -
 string.h
 -
 
-/home/zhounan/develop/cpp/plsa/src/../include/tinyxml.h
+/home/zhounan/project/ict/plsa/plsa/src/../include/tinyxml.h
 ctype.h
 -
 stdio.h
@@ -88,9 +88,9 @@ string
 iostream
 -
 tinystr.h
-/home/zhounan/develop/cpp/plsa/src/../include/tinystr.h
+/home/zhounan/project/ict/plsa/plsa/src/../include/tinystr.h
 
-/home/zhounan/develop/cpp/plsa/src/../include/util.h
+/home/zhounan/project/ict/plsa/plsa/src/../include/util.h
 iostream
 -
 fstream
@@ -106,25 +106,25 @@ unistd.h
 fcntl.h
 -
 const.h
-/home/zhounan/develop/cpp/plsa/src/../include/const.h
+/home/zhounan/project/ict/plsa/plsa/src/../include/const.h
 glog/logging.h
-/home/zhounan/develop/cpp/plsa/src/../include/glog/logging.h
+/home/zhounan/project/ict/plsa/plsa/src/../include/glog/logging.h
 
-/home/zhounan/develop/cpp/plsa/src/plsa.cpp
+/home/zhounan/project/ict/plsa/plsa/src/plsa.cpp
 plsa.h
-/home/zhounan/develop/cpp/plsa/src/plsa.h
+/home/zhounan/project/ict/plsa/plsa/src/plsa.h
 
-/home/zhounan/develop/cpp/plsa/src/plsa_train.cpp
+/home/zhounan/project/ict/plsa/plsa/src/plsa_train.cpp
 plsa.h
-/home/zhounan/develop/cpp/plsa/src/plsa.h
+/home/zhounan/project/ict/plsa/plsa/src/plsa.h
 tinyxml.h
-/home/zhounan/develop/cpp/plsa/src/tinyxml.h
+/home/zhounan/project/ict/plsa/plsa/src/tinyxml.h
 tinystr.h
-/home/zhounan/develop/cpp/plsa/src/tinystr.h
+/home/zhounan/project/ict/plsa/plsa/src/tinystr.h
 iostream
 -
 
-/home/zhounan/develop/cpp/plsa/src/util.cpp
+/home/zhounan/project/ict/plsa/plsa/src/util.cpp
 util.h
-/home/zhounan/develop/cpp/plsa/src/util.h
+/home/zhounan/project/ict/plsa/plsa/src/util.h
 

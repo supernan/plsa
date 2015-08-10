@@ -123,6 +123,22 @@ def process_single_file(path, words_dict):
 	return doc_dict
 
 
+def process_single_text(raw_text, words_dict):
+	"""
+	预处理单独的文件，返回文档tf统计
+	"""
+	doc_dict = dict()
+	word_list = list(jieba.cut(raw_text, cut_all = False))
+	for word in word_list:
+		word_key = word.encode("utf-8")
+		if words_dict.has_key(word_key):
+			if doc_dict.has_key(word_key):
+				doc_dict[word_key] += 1
+			else:
+				doc_dict[word_key] = 1
+	return doc_dict
+
+
 def process_train_set(root_dir, dict_path):
 	"""
 	预处理训练预料，生成训练数据
@@ -137,11 +153,21 @@ def process_train_set(root_dir, dict_path):
 			count += 1
 
 
-def preprocess(root_dir, dict_path):
+def preprocess(train_path, dict_path):
 	"""
 	预处理训练数据
 	"""
-	process_train_set(root_dir, dict_path)
+        words_dict = load_dict(dict_path)
+        f = open(train_path)
+        count = 0
+        for line in f:
+            parts = line.strip().split("||")
+            raw_text = parts[1]
+            doc_dict = process_single_text(raw_text, words_dict)
+            doc_str = dict2str(doc_dict, words_dict)
+            print count, doc_str
+            count += 1
+	#process_train_set(root_dir, dict_path)
 
 
 def extract_docs(root_dir, doc_list):
@@ -154,6 +180,19 @@ def extract_docs(root_dir, doc_list):
 			if count in doc_list:
 				extract_single_doc(os.path.join(parent, filename))
 			count += 1
+
+
+def extract(path, doc_list):
+    """
+    抽取话题文本
+    """
+    f = open(path)
+    count = 0
+    for line in f:
+        if count in doc_list:
+            print line.strip()
+        count += 1
+
 
 
 def extract_single_doc(path):
@@ -186,20 +225,21 @@ def handle_plsa_result(path, topic_num):
 			if prob > max_prob:
 				max_prob = prob
 				max_topic = i
-                print max_topic
 		topic_dict[max_topic].append(count)
                 count += 1
 	return topic_dict
 
 
-def show_topics(root_dir, plsa_path, topic_num, topic):
+def show_topics(train_path, plsa_path, topic_num, topic):
 	"""
 	展示某个话题的聚类效果
 	"""
 	topic_dict = handle_plsa_result(plsa_path, topic_num)
-	doc_list = topic_dict[topic]
+        for key in topic_dict:
+            print key, len(topic_dict[key])
+        doc_list = topic_dict[topic]
 	if len(doc_list) > 0:
-		extract_docs(root_dir, doc_list)
+		extract(train_path, doc_list)
 
 
 def get_topic_words(term_probs_path, dict_path):

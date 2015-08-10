@@ -1,1 +1,1 @@
-/home/zhounan/develop/cpp/plsa/build/CMakeFiles/plsa_train.dir
+/home/zhounan/project/ict/plsa/plsa/build/CMakeFiles/plsa_train.dir
