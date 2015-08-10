@@ -7,4 +7,5 @@ if __name__ == '__main__':
 	plsa_path = sys.argv[2]
 	topic_num = int(sys.argv[3])
 	topic_id = int(sys.argv[4])
+	print topic_num, topic_id
 	pl.show_topics(root_dir, plsa_path, topic_num, topic_id)

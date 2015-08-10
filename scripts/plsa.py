@@ -172,12 +172,13 @@ def handle_plsa_result(path, topic_num):
 	"""
 	f = open(path)
 	topic_dict = dict()
-	count = 0
 	for i in range(topic_num):
 		doc_list = []
 		topic_dict[i] = doc_list
+        count = 0
 	for line in f:
 		parts = line.strip().split(" ")
+                parts = parts[1:]
 		max_prob = float(parts[0])
 		max_topic = 0
 		for i in range(len(parts)):
@@ -185,8 +186,9 @@ def handle_plsa_result(path, topic_num):
 			if prob > max_prob:
 				max_prob = prob
 				max_topic = i
+                print max_topic
 		topic_dict[max_topic].append(count)
-		count += 1
+                count += 1
 	return topic_dict
 
 
@@ -218,7 +220,7 @@ def get_topic_words(term_probs_path, dict_path):
 	line_num = 0
 	for line in term_prob_f:
 		parts = line.strip().split(" ")
-		
+                parts = parts[1:]
 		if is_first_line:
 			topics = len(parts)
 			for i in range(topics):

@@ -7,7 +7,7 @@
 #!/bin/bash
 
 PY_HOME=./scripts
-PROJECT_HOME=/home/zhounan/develop/cpp/plsa
+PROJECT_HOME=/home/zhounan/project/ict/plsa/plsa
 ROOT_DIR=/home/zhounan/corpus/sogou_part #语料库文件夹地址
 TEST_DIR=/home/zhounan/corpus/sogou_test #测试语料地址
 STOP_WORDS_PATH=/home/zhounan/corpus/stop_words #停用词表地址
@@ -17,7 +17,7 @@ TRAIN_PATH=$PROJECT_HOME/build/ #训练程序路径
 DOC_PLSA=$PROJECT_HOME/data/doc_probs #PLSA文档话题分布
 TERM_PLSA=$PROJECT_HOME/data/term_probs #PLSA词项话题分布
 TOPIC_NUM=10 #话题数
-TOPIC_ID=0 #要查看的话题id
+TOPIC_ID=5 #要查看的话题id
 RESULT_PATH=$PROJECT_HOME/data #存储展示结果的路径
 
 function gen_dict()
