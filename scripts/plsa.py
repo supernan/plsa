@@ -74,6 +74,8 @@ def encode_words_dict(words_dict):
 	total = 0.0
 	sorted_list = sorted(words_dict.iteritems(), key=lambda d:d[1], reverse = True)
 	for word_tuple in sorted_list:
+                if word_tuple[0].encode("utf-8").strip() == "":
+                    continue
 		id_list.append(count)
 		word_list.append(word_tuple[0].encode("utf-8"))
 		tf_list.append(float(word_tuple[1]))

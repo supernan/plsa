@@ -46,7 +46,7 @@ void tools::Util::read_words_dict(std::string &path, std::map<int, double> &dict
 		std::string key = " ";
 		_split_line(line, key, parts);
 		if (parts.size() < 3)
-			LOG(FATAL) << "dict file format is wrong" << std::endl;
+			LOG(FATAL) << "dict file format is wrong" <<" "<<"line: "<<count<< std::endl;
 		int word_id = atoi(parts[0].c_str());
 		double tf = atof(parts[2].c_str());
 		dict_tf[word_id] = tf;
@@ -70,7 +70,7 @@ void tools::Util::read_doc_tf(std::string &path, double counts[MAX_DOCS][MAX_TER
 		std::string first_key = " ";
 		_split_line(line, first_key, parts);
 		if (parts.size() != 2)
-			LOG(FATAL) << "doc file format is wrong :parts size error" << std::endl;
+			LOG(FATAL) << "doc file format is wrong :parts size error" <<" "<<"line: "<<docs_num<< std::endl;
 		int doc_id = atoi(parts[0].c_str());
 		double total_words = 0;
 
