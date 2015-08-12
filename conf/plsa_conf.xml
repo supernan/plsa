@@ -1,7 +1,7 @@
 <Plsa>
-	<topics>10</topics>
+	<topics>2</topics>
 	<iteration>50</iteration>
-	<lambda>0.5</lambda>
-	<dict>../data/words_tf</dict>
-	<doc_tf>../data/doc_word2</doc_tf>
+	<lambda>0.9</lambda>
+	<dict>../data/event_words_tf</dict>
+	<doc_tf>../data/event_doc_word2</doc_tf>
 </Plsa>  

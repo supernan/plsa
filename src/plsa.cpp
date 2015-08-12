@@ -85,13 +85,14 @@ void nlp::Plsa::_init_z_variable()
 			int total = 0;
 			for (int k = 0; k < _topics_nums; k++)
 			{
-				int num = rand()%100;
+				int num = rand()%100 + 1;
 				random_nums.push_back(num);
 				total += num;
 			}
 			for (int k = 0; k < _topics_nums; k++)
 			{
 				double prob = double(random_nums[k]) / double(total);
+				//std::cout<<k<<" "<<random_nums[k]<<" "<<total<<" "<<prob<<std::endl;
 				_doc_term_probs[i][j][k] = prob;
 			}
 		}
@@ -125,6 +126,7 @@ void nlp::Plsa::_calc_z_variable()
 			{
 				if (_doc_term_probs[i][j][k] != 0)
 					_doc_term_probs[i][j][k] /= topic_sum;
+				//std::cout<<_doc_term_probs[i][j][k]<<std::endl;
 			}
 			double lm_prob = _tfs_map[j];
 			_doc_term_probs[i][j][LM] = (_lambda * lm_prob) / (_lambda * lm_prob + (1 - _lambda) * topic_sum);
@@ -152,9 +154,9 @@ void nlp::Plsa::_calc_PI_variable()
 			for (int j = 0; j < _terms_nums; j++)
 			{
 				term_sum += _counts[i][j] * (1 - _doc_term_probs[i][j][LM]) * _doc_term_probs[i][j][k];
+			    //std::cout<<_counts[i][j]<<" "<<" "<<_doc_term_probs[i][j][LM]<<" "<<_doc_term_probs[i][j][k]<<" "<<term_sum<<std::endl;
 			}
 			_doc_probs[i][k] = term_sum;
-			//std::cout<<_doc_probs[i][k]<<std::endl;
 			topic_sum += term_sum;
 		}
 		for (int k = 0; k < _topics_nums; k++)
