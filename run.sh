@@ -8,10 +8,11 @@
 
 PY_HOME=./scripts
 PROJECT_HOME=/home/zhounan/project/ict/plsa/plsa
-ROOT_DIR=/home/zhounan/corpus/events/sunyang_swimming #语料库文件夹地址
-TRAIN_CORPUS=/home/zhounan/corpus/events/sunyang #语料文件
+ROOT_DIR=/home/zhounan/corpus/events/winterOlympic #语料库文件夹地址
+TRAIN_CORPUS=/home/zhounan/corpus/events/winterOlympics #语料文件
 TEST_DIR=/home/zhounan/corpus/events #测试语料地址
 STOP_WORDS_PATH=/home/zhounan/corpus/stop_words #停用词表地址
+W2V_PATH=/home/zhounan/local/word2vec/output/winter.vec #词向量路径
 DICT_PATH=$PROJECT_HOME/data/event_words_tf #生成的字典地址
 TRAIN_FILE_PATH=$PROJECT_HOME/data/event_doc_word2 #训练数据地址
 TRAIN_PATH=$PROJECT_HOME/build/ #训练程序路径
@@ -69,8 +70,16 @@ function predict_topic()
 }
 
 
+function evaluate()
+{
+	cd $PY_HOME
+	echo `pwd`
+	python evaluate.py $W2V_PATH $TERM_PLSA $DICT_PATH > $RESULT_PATH/topic_eval
+}
+
+
 ################### main function ######################
-	while getopts "gptswk" arg
+	while getopts "gptswke" arg
 	echo $arg
 	do
 		case $arg in 
@@ -102,6 +111,11 @@ function predict_topic()
 			k)
 				echo "文档话题预测"
 				predict_topic
+				break
+				;;
+			e)
+				echo "话题评价"
+				evaluate
 				break
 				;;
 			?)

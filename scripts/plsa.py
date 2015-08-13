@@ -3,6 +3,7 @@ import jieba
 import os
 import sys
 import math
+import numpy as np
 
 #train_set = []
 #root_dir = "/home/zhounan/corpus/sogou_part"
@@ -248,6 +249,7 @@ def get_topic_words(term_probs_path, dict_path):
 	"""
 	展现每个话题的高频词
 	"""
+        topic_words_dict = dict()
 	dict_f = open(dict_path)
 	term_prob_f = open(term_probs_path)
 	words_dict = dict()
@@ -278,9 +280,13 @@ def get_topic_words(term_probs_path, dict_path):
 	for topic_id in topic_dict:
 		topic_sorted= sorted(topic_dict[topic_id].iteritems(), key=lambda d:d[1], reverse = True)[:10]
 		top_words = []
+                top_list = []
 		for t in topic_sorted:
 			top_words.append(str(t[0]) + ":" + str(t[1]))
+                        top_list.append(str(t[0]))
 		print ' '.join(top_words)
+                topic_words_dict[topic_id] = top_list
+        return topic_words_dict
 
 
 def read_test_files(root_dir):
@@ -382,21 +388,80 @@ def predict_test_files(dict_path, root_dir, term_probs_path, topic_num):
 		print
 
 
+def load_word2vec(path):
+    """
+    加载训练好的词向量
+    """
+    f = open(path)
+    is_first_line = True
+    word2vec = dict()
+    for line in f:
+        if is_first_line:
+            is_first_line = False
+            continue
+        parts = line.strip().split(" ")
+        word = parts[0]
+        parts = parts[1:]
+        vec = []
+        for part in parts:
+            vec.append(float(part))
+        word2vec[word] = vec
+    return word2vec
+
+
+def cosin_similarity(v1, v2):
+    """
+    计算余弦相似度
+    """
+    if len(v1) == 0:
+        vec1 = np.mat(np.zeros(200))
+    else:
+        vec1 = np.mat(v1)
+    if len(v2) == 0:
+        vec2 = np.mat(np.zeros(200))
+    else:
+        vec2 = np.mat(v2)
+    num = float(vec1 * vec2.T)
+    denom = np.linalg.norm(vec1) * np.linalg.norm(vec2)
+    if denom == 0:
+        cos = -1
+    else:
+        cos = num / denom
+    sim = 0.5 + 0.5 * cos
+    return sim
 
 
 
+def evaluate(w2v_path, term_probs_path, dict_path):
+    """
+    话题评价
+    """
+    word2vec = load_word2vec(w2v_path)
+    topic_dict = get_topic_words(term_probs_path, dict_path)
+    score = 0.0
+    size = len(topic_dict)
+    for tid in topic_dict:
+        N = len(topic_dict[tid])
+        m = np.zeros((N, N))
+        words = topic_dict[tid]
+        for i in range(len(words)):
+            for j in range(len(words)):
+                if i == j:
+                    continue
+                if not word2vec.has_key(words[i]):
+                    vec1 = []
+                else:
+                    vec1 = word2vec[words[i]]
+                if not word2vec.has_key(words[j]):
+                    vec2 = []
+                else:
+                    vec2 = word2vec[words[j]]
+                m[i][j] = cosin_similarity(vec1, vec2)
+        score += np.sum(m)
+    print "score: ", float(score) / float(size)
 
-		
 
 
-				
-
-
-
-
-	
-
-#get_topic_words("/home/zhounan/develop/cpp/plsa/data/term_probs", "/home/zhounan/develop/cpp/plsa/data/words_tf")
 #generate_words_dict()
 #show_topics(root_dir, "doc_probs", 10, 3)
 #process_train_set(root_dir)
