@@ -25,6 +25,18 @@ def load_dict(path):
 	return words_dict
 
 
+def load_word_tf(path):
+    """
+    加载词典和对应的词频
+    """
+    f = open(path)
+    words_tf = dict()
+    for line in f:
+        parts = line.strip().split(" ")
+        words_tf[parts[1]] = float(parts[2])
+    return words_tf
+
+
 def load_stop_words(path):
 	"""
 	加载停用词
@@ -438,12 +450,19 @@ def evaluate(w2v_path, term_probs_path, dict_path):
     """
     word2vec = load_word2vec(w2v_path)
     topic_dict = get_topic_words(term_probs_path, dict_path)
+    words_tf = load_word_tf(dict_path)
     score = 0.0
     size = len(topic_dict)
+    means = []
     for tid in topic_dict:
         N = len(topic_dict[tid])
         m = np.zeros((N, N))
         words = topic_dict[tid]
+        mean_tf = 0.0
+        for i in range(len(words)):
+            mean_tf += words_tf[words[i]]
+        mean_tf = mean_tf / float(len(words))
+        means.append(mean_tf)
         for i in range(len(words)):
             for j in range(len(words)):
                 if i == j:
@@ -457,8 +476,11 @@ def evaluate(w2v_path, term_probs_path, dict_path):
                 else:
                     vec2 = word2vec[words[j]]
                 m[i][j] = cosin_similarity(vec1, vec2)
+        print tid
+        print m
         score += np.sum(m)
-    print "score: ", float(score) / float(size)
+    var = -math.log(np.mean(means))
+    print "score: ", float(score) / float(size), " var: ", var
 
 
 
