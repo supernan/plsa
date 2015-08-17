@@ -476,8 +476,6 @@ def evaluate(w2v_path, term_probs_path, dict_path):
                 else:
                     vec2 = word2vec[words[j]]
                 m[i][j] = cosin_similarity(vec1, vec2)
-        print tid
-        print m
         score += np.sum(m)
     var = -math.log(np.mean(means))
     print "score: ", float(score) / float(size), " var: ", var
