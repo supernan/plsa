@@ -111,6 +111,8 @@ def dict2str(doc_dict, words_dict):
 	将文本统计结果转化成指定格式的字符串
 	"""
 	ret = ""
+        if len(words_dict) == 0:
+            return ret
 	for word in doc_dict:
 		word_id = words_dict[word]
 		ret += str(word_id)
@@ -164,7 +166,7 @@ def process_train_set(root_dir, dict_path):
 		for filename in files:
 			doc_dict = process_single_file(os.path.join(parent, filename), words_dict)
 			doc_str = dict2str(doc_dict, words_dict)
-			print count, doc_str
+			print count, doc_str, len(doc_str)
 			count += 1
 
 
@@ -180,6 +182,8 @@ def preprocess(train_path, dict_path):
             raw_text = parts[1]
             doc_dict = process_single_text(raw_text, words_dict)
             doc_str = dict2str(doc_dict, words_dict)
+            if len(doc_str) == 0:
+                continue
             print count, doc_str
             count += 1
 	#process_train_set(root_dir, dict_path)

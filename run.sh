@@ -8,13 +8,13 @@
 
 PY_HOME=./scripts
 PROJECT_HOME=/home/zhounan/project/ict/plsa/plsa
-ROOT_DIR=/home/zhounan/corpus/events/winterOlympic #语料库文件夹地址
-TRAIN_CORPUS=/home/zhounan/corpus/events/winterOlympics #语料文件
+ROOT_DIR=/home/zhounan/corpus/events/emergency3_sample2 #语料库文件夹地址
+TRAIN_CORPUS=/home/zhounan/corpus/events/sample_3_2 #语料文件
 TEST_DIR=/home/zhounan/corpus/events #测试语料地址
 STOP_WORDS_PATH=/home/zhounan/corpus/stop_words #停用词表地址
-W2V_PATH=/home/zhounan/local/word2vec/output/winter.vec #词向量路径
-DICT_PATH=$PROJECT_HOME/data/event_words_tf #生成的字典地址
-TRAIN_FILE_PATH=$PROJECT_HOME/data/event_doc_word2 #训练数据地址
+W2V_PATH=/home/zhounan/local/word2vec/output/tianjin.vec #词向量路径
+DICT_PATH=$PROJECT_HOME/data/sample_words_tf #生成的字典地址
+TRAIN_FILE_PATH=$PROJECT_HOME/data/sample_doc_word2 #训练数据地址
 TRAIN_PATH=$PROJECT_HOME/build/ #训练程序路径
 DOC_PLSA=$PROJECT_HOME/data/doc_probs #PLSA文档话题分布
 TERM_PLSA=$PROJECT_HOME/data/term_probs #PLSA词项话题分布
@@ -126,6 +126,7 @@ function evaluate()
 				echo "-s 展示训练数据的聚类效果"
 				echo "-w 展示每个话题的中心词"
 				echo "-k 预测文档的话题分类"
+				echo "-e 评价生成的话题效果"
 				echo "运行前需要配置脚本中的参数！"
 				break
 				;;
