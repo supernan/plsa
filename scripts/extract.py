@@ -8,8 +8,8 @@ cutlist = "。！？".decode("utf-8")
 #key_words = ["顿","近震","ML","震级","地震","记录","公安局","分","台网","火光冲天"]
 key_words = ["北京","医疗","空气质量","今日","血液","指数","包括","污染物","重症","中午"]
 
-corpus_path = "/home/zhounan/corpus/events/sample4" #要扫描的语料路径
-topic_words_path = "/home/zhounan/project/ict/plsa/plsa/data/sample4/topic_words" #主题模型生产的话题词
+corpus_path = "/home/zhounan/corpus/events/other_part" #要扫描的语料路径
+topic_words_path = "/home/zhounan/project/ict/plsa/plsa/data/others/topic_words" #主题模型生产的话题词
 min_keys = 2 #句子中包含的最小关键词个数, 大于此值才统计关键词的共现情况
 tf_thresh = 5 #话题词共现的阈值
 min_len = 3 #话题词的最小长度
@@ -40,10 +40,10 @@ def generate_cluster(path, topic_words):
     """
     f = open(path)
     text_clusters = dict()
-    snips_clusters = dict()
+    for i in range(len(topic_words)):
+        text_clusters[i] = []
     for line in f:
-        for topic_id in topic_words:
-            snips_clusters[topic_id] = ""
+        for topic_id in range(len(topic_words)):
             words = topic_words[topic_id]
             if wc.key_words_match(line.strip(), words):
                 if text_clusters.has_key(topic_id):

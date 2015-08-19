@@ -6,6 +6,7 @@
 import numpy as np
 import words_cluster as wc
 import esm
+import extract as ex
 
 tf_thresh = 10
 min_len = 4
@@ -102,6 +103,7 @@ def topic_compare(topic_A, topic_B, w2v):
             else:
                 v_b = []
             score_mat[i, j] = word_similarity(v_a, v_b)
+            #print topic_A[i], topic_B[j], score_mat[i, j]
     score = score_mat.sum()
     return score
 
@@ -128,6 +130,7 @@ def word_similarity(v1, v2):
     sim = 0.5 + 0.5 * cos
     return sim
 
+
 def generate_summary(key_words, corpus_path):
     """
     生成相似子话题的共同摘要
@@ -147,20 +150,71 @@ def generate_summary(key_words, corpus_path):
         ret_topics[i] = topic_words[i]
     return ret_topics
     
+
+def get_background_index(back_path):
+    f = open(back_path)
+    index = esm.Index()
+    for line in f:
+        """
+        parts = line.split(" ")
+        for part in parts:
+            pairs = part.split(":")
+            index.enter(pairs[0])
+        """
+        index.enter(line.strip().split(" ")[0])
+    index.fix()
+    return index
     
+
+def get_common_background(cluster_A, cluster_B, back_index):
+    backgroud_set = set()
+    common_words = set()
+    for text in cluster_A:
+        rets = back_index.query(text)
+        for word in rets:
+            backgroud_set.add(word[1])
+    for text in cluster_B:
+        rets = back_index.query(text)
+        for word in rets:
+            if word[1] in backgroud_set:
+                common_words.add(word[1])
+    return common_words
+
+
+def event_in_common(back_path, corpus_path, event_A, event_B):
+    back_index = get_background_index(back_path)
+    size_A = len(event_A)
+    size_B = len(event_B)
+    cluster_A = ex.generate_cluster(corpus_path, event_A)
+    cluster_B = ex.generate_cluster(corpus_path, event_B)
+    for i in range(size_A):
+        for j in range(size_B):
+            common_words = get_common_background(cluster_A[i], cluster_B[j], back_index)
+            print 
+            print "================================================="
+            print "common words: " + ','.join(common_words)
+            print "sub_topic A: " + ','.join(event_A[i])
+            print "sub_topic B: " + ','.join(event_B[j])
+            print "=================================================="
+            print
+
+
 
 
 if __name__ == '__main__':
-    event_A, event_B = load_event("./sample_1_2", "./sample_1_4")
-    w2v = load_word2vec("/home/zhounan/local/word2vec/output/weibo_event_0.vec")
+    event_A, event_B = load_event("./niboer", "./others")
+    w2v = load_word2vec("/home/zhounan/local/word2vec/output/weibo_event_2.vec")
+    event_in_common("./back_words", "/home/zhounan/corpus/mongo_data/weibo_event_2", event_A, event_B)
+    """
     topic_A, topic_B = event_compare(event_A, event_B, w2v)
     print ','.join(topic_A)
     print ','.join(topic_B)
     print
     key_words = topic_A + topic_B
-    rets = generate_summary(key_words, "/home/zhounan/corpus/mongo_data/weibo_event_0")
+    rets = generate_summary(key_words, "/home/zhounan/corpus/mongo_data/weibo_event_2")
     for k in rets:
         print ','.join(rets[k])
+    """
 
 
 
