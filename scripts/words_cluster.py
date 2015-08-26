@@ -101,16 +101,20 @@ def key_words_analysis(M, thresh, key_words):
 	return clusters
 	
 
-def key_words_match(text, key_words):
+def key_words_match(text, key_words, rate):
 	"""
 	判断文本是否完全与某一组关键词匹配
 	"""
-	flg = True
+	count = 0
+        #flg = True
 	for word in key_words:
-		if text.find(word) == -1:
-			flg = False
-			break
-	return flg
+		if text.find(word) != -1:
+			count += 1
+
+        if count >= int(rate * len(key_words)):
+            return True
+        else:
+            return False
 
 	
 def read_topic_words(path):
