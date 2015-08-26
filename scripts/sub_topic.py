@@ -11,7 +11,8 @@ import esm
 import extract as ex
 
 tf_thresh = 10
-min_len = 4
+min_len = 3 #common words的最小长度
+rate = 0.8 #子话题关键词匹配的准确率阈值
 cutlist = "。！？".decode("utf-8")
 
 
@@ -197,7 +198,7 @@ def get_background_index(back_path):
     return index
 
 
-def get_common_background(cluster_A, cluster_B, back_index, df_map):
+def get_common_background(cluster_A, cluster_B, back_index, df_map, min_len):
     """
     得到两个子话题共同的背景词
     """
@@ -233,12 +234,11 @@ def get_common_background(cluster_A, cluster_B, back_index, df_map):
     for key in common_words:
         if df_map.has_key(key):
             common_words[key] = math.log(float(common_words[key])) * math.log(float(1) / float(df_map[key])) #/ float(df_map[key])
-    if len(common_words) < 3:
+    if len(common_words) < min_len:
         return []
     ret = []
     words =  sorted(common_words.items(), key=lambda d: d[1], reverse = True)[:4]
     for i in range(len(words)):
-        #print words[i][0], words[i][1]
         ret.append(words[i][0])
     return ret
 
@@ -271,20 +271,20 @@ def choose_best_label(word_label_map, common_words):
         if label_count_map[label] > max_count:
             max_count = label_count_map[label]
             best_label = label
-    return label
+    return best_label
 
 
-def event_in_common(word_label_map, back_index, corpus_path, event_A, event_B, df_map, A_name, B_name):
+def event_in_common(word_label_map, back_index, corpus_path, event_A, event_B, df_map, A_name, B_name, min_len, rate):
     """
     比较两个事件任意子话题对的共同点
     """
     size_A = len(event_A)
     size_B = len(event_B)
-    cluster_A, max_time_A, min_time_A = ex.generate_cluster_time(corpus_path, event_A)
-    cluster_B, max_time_B, min_time_B = ex.generate_cluster_time(corpus_path, event_B)
+    cluster_A, max_time_A, min_time_A = ex.generate_cluster_time(corpus_path, event_A, rate)
+    cluster_B, max_time_B, min_time_B = ex.generate_cluster_time(corpus_path, event_B, rate)
     for i in range(size_A):
         for j in range(size_B):
-            common_words = get_common_background(cluster_A[i], cluster_B[j], back_index, df_map)
+            common_words = get_common_background(cluster_A[i], cluster_B[j], back_index, df_map, min_len)
             if len(common_words) == 0:
                 continue
             best_label = choose_best_label(word_label_map, common_words)
@@ -299,7 +299,7 @@ def event_in_common(word_label_map, back_index, corpus_path, event_A, event_B, d
             print
 
 
-def events_analysis(filenames, total_corpus_path, df_path, back_path, label_path):
+def events_analysis(filenames, total_corpus_path, df_path, back_path, label_path, min_len, rate):
     key_set = set()
     back_index = get_background_index(back_path)
     word_label_map = load_word_label_map(label_path)
@@ -319,7 +319,7 @@ def events_analysis(filenames, total_corpus_path, df_path, back_path, label_path
                 key_set.add(key)
                 print filenames[i], filenames[j]
                 event_A, event_B = load_event(filenames[i], filenames[j])
-                event_in_common(word_label_map, back_index, total_corpus_path, event_A, event_B, df_map, filenames[i], filenames[j])
+                event_in_common(word_label_map, back_index, total_corpus_path, event_A, event_B, df_map, filenames[i], filenames[j], min_len, rate)
                 print "End"
                 print
                 
@@ -331,7 +331,7 @@ def events_analysis(filenames, total_corpus_path, df_path, back_path, label_path
 if __name__ == '__main__':
     filenames = ["./niboer", "./sichuan", "./taiwan", "./xinjiang"]
     events_analysis(filenames, "/home/zhounan/corpus/mongo_data/news_event/earthquake/earthquake_time", "./earthquake_df", "../data/earthquake/topic_words",
-                    "../data/earthquake/topic_words_label")
+                    "../data/earthquake/topic_words_label", min_len, rate)
     #event_A, event_B = load_event("./canhong", "./sudiluo")
     #df_map = load_df_map("./taifeng_back")
     #w2v= load_word2vec("/home/zhounan/local/word2vec/output/tianfeng.vec")

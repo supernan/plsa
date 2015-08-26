@@ -39,7 +39,7 @@ def extract_time(line):
 	return time_str
 
 
-def generate_cluster_time(path, topic_words):
+def generate_cluster_time(path, topic_words, rate):
     """
     生成文本话题簇
     """
@@ -56,7 +56,7 @@ def generate_cluster_time(path, topic_words):
         for topic_id in range(len(topic_words)):
             words = topic_words[topic_id]
             time_list = []
-            if wc.key_words_match(line.strip(), words, 0.8):
+            if wc.key_words_match(line.strip(), words, rate):
 		time_str = extract_time(line)
                 time_list.append(time_str)
                 if text_clusters.has_key(topic_id):
