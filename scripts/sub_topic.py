@@ -13,6 +13,7 @@ import extract as ex
 tf_thresh = 10
 min_len = 3 #common words的最小长度
 rate = 0.8 #子话题关键词匹配的准确率阈值
+label_thresh = 2
 cutlist = "。！？".decode("utf-8")
 
 
@@ -176,9 +177,11 @@ def load_word_label_map(path):
         parts = parts[1:]
         for part in parts:
             labels.append(part.strip())
-        word_label_map[word] = labels
+        if not word_label_map.has_key(word):
+            word_label_map[word] = labels
+        else:
+            word_label_map[word] += labels
     return word_label_map
-        
 
 
 def get_background_index(back_path):
@@ -225,9 +228,13 @@ def get_common_background(cluster_A, cluster_B, back_index, df_map, min_len):
     
     for key in cluster_A_map:
         A_count = cluster_A_map[key]
+        #if A_count < len(cluster_A_map):
+        #    continue
         if not cluster_B_map.has_key(key):
             continue
         B_count = cluster_B_map[key]
+        #if B_count < len(cluster_B_map):
+        #    continue
         if abs(A_count - B_count) < min(A_count, B_count) / 2:
             common_words[key] = A_count + B_count
     
@@ -274,7 +281,55 @@ def choose_best_label(word_label_map, common_words):
     return best_label
 
 
-def event_in_common(word_label_map, back_index, corpus_path, event_A, event_B, df_map, A_name, B_name, min_len, rate):
+def choose_sub_topic_best_label(topic_words_A, topic_words_B, word_label_map, label_thresh):
+    label_count_map_A = dict()
+    label_count_map_B = dict()
+    for word in topic_words_A:
+        labels = word_label_map[word]
+        for label in labels:
+            if label_count_map_A.has_key(label):
+                label_count_map_A[label] += 1
+            else:
+                label_count_map_A[label] = 1
+    max_count = 0
+    best_label_A = ""
+    total_count = 0
+    for label in label_count_map_A:
+        total_count += label_count_map_A[label]
+        if label_count_map_A[label] > max_count:
+            max_count = label_count_map_A[label]
+            best_label_A = label
+    if max_count < total_count / label_thresh:
+        best_label_A = "NONE"
+    
+    best_label_B = ""
+    for word in topic_words_B:
+        labels = word_label_map[word]
+        for label in labels:
+            if label_count_map_B.has_key(label):
+                label_count_map_B[label] += 1
+            else:
+                label_count_map_B[label] = 1
+    
+    max_count = 0
+    total_count = 0
+    best_label_B = ""
+    for label in label_count_map_B:
+        total_count += label_count_map_B[label]
+        if label_count_map_B[label] > max_count:
+            max_count = label_count_map_B[label]
+            best_label_B = label
+    if max_count < total_count / label_thresh:
+        best_label_B = "NONE"
+
+    if best_label_A == best_label_B:
+        return best_label_A
+    else:
+        return "NONE"
+
+
+def event_in_common(word_label_map, back_index, corpus_path, event_A, event_B, df_map, 
+                    A_name, B_name, min_len, rate, label_thresh):
     """
     比较两个事件任意子话题对的共同点
     """
@@ -284,22 +339,29 @@ def event_in_common(word_label_map, back_index, corpus_path, event_A, event_B, d
     cluster_B, max_time_B, min_time_B = ex.generate_cluster_time(corpus_path, event_B, rate)
     for i in range(size_A):
         for j in range(size_B):
+            """
             common_words = get_common_background(cluster_A[i], cluster_B[j], back_index, df_map, min_len)
             if len(common_words) == 0:
                 continue
             best_label = choose_best_label(word_label_map, common_words)
             if best_label == "NONE":
                 continue
+            """
+            best_label = choose_sub_topic_best_label(event_A[i], event_B[j], word_label_map, label_thresh)
+            if best_label == "NONE":
+                continue
             print 
-            print "================================================="
-            print "common words: " + ','.join(common_words) + " " + "[" + best_label + "]"
+            print "=================================================="
+            #print "common words: " + ','.join(common_words) + " " + "[" + best_label + "]"
+            print "[" + best_label + "]"
             print "sub_topic " + A_name + " " + str(i) + " " + ','.join(event_A[i]) + " " + min_time_A[i] + " " + max_time_A[i]
             print "sub_topic " + B_name + " " + str(j) + " " + ','.join(event_B[j]) + " " + min_time_B[j] + " " + max_time_B[j]
             print "=================================================="
             print
 
 
-def events_analysis(filenames, total_corpus_path, df_path, back_path, label_path, min_len, rate):
+def events_analysis(filenames, total_corpus_path, df_path, 
+                    back_path, label_path, min_len, rate, label_thresh):
     key_set = set()
     back_index = get_background_index(back_path)
     word_label_map = load_word_label_map(label_path)
@@ -319,7 +381,8 @@ def events_analysis(filenames, total_corpus_path, df_path, back_path, label_path
                 key_set.add(key)
                 print filenames[i], filenames[j]
                 event_A, event_B = load_event(filenames[i], filenames[j])
-                event_in_common(word_label_map, back_index, total_corpus_path, event_A, event_B, df_map, filenames[i], filenames[j], min_len, rate)
+                event_in_common(word_label_map, back_index, total_corpus_path, event_A, event_B, df_map, filenames[i], filenames[j], 
+                                min_len, rate, label_thresh)
                 print "End"
                 print
                 
@@ -331,7 +394,7 @@ def events_analysis(filenames, total_corpus_path, df_path, back_path, label_path
 if __name__ == '__main__':
     filenames = ["./niboer", "./sichuan", "./taiwan", "./xinjiang"]
     events_analysis(filenames, "/home/zhounan/corpus/mongo_data/news_event/earthquake/earthquake_time", "./earthquake_df", "../data/earthquake/topic_words",
-                    "../data/earthquake/topic_words_label", min_len, rate)
+                    "./total_labels", min_len, rate, label_thresh)
     #event_A, event_B = load_event("./canhong", "./sudiluo")
     #df_map = load_df_map("./taifeng_back")
     #w2v= load_word2vec("/home/zhounan/local/word2vec/output/tianfeng.vec")
