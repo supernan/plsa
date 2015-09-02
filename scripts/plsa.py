@@ -179,6 +179,8 @@ def preprocess(train_path, dict_path):
         count = 0
         for line in f:
             parts = line.strip().split("||")
+            if len(parts) < 2:
+                continue
             raw_text = parts[1]
             doc_dict = process_single_text(raw_text, words_dict)
             doc_str = dict2str(doc_dict, words_dict)
