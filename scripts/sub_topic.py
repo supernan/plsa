@@ -134,23 +134,6 @@ def word_similarity(v1, v2):
     sim = 0.5 + 0.5 * cos
     return sim
 
-"""
-def generate_summary(key_words, corpus_path):
-    size = len(key_words)
-    M = np.mat(np.zeros((size, size)))
-    f = open(corpus_path)
-    for line in f:
-        wc.make_common_matrix(line, M, key_words)
-    topic_words = []
-    C = wc.key_words_analysis(M, tf_thresh, key_words)
-    for key in C:
-        if len(C[key]) >= min_len:
-            topic_words.append(C[key])
-    ret_topics = dict()
-    for i in range(len(topic_words)):
-        ret_topics[i] = topic_words[i]
-    return ret_topics
-"""
 
 def load_df_map(path):
     """
@@ -163,25 +146,6 @@ def load_df_map(path):
         df_map[parts[0]] = float(parts[1])
     return df_map
 
-
-def load_word_label_map(path):
-    """
-    加载标注好的背景词
-    """
-    f = open(path)
-    word_label_map = dict()
-    for line in f:
-        labels = []
-        parts = line.split("||")
-        word = parts[0]
-        parts = parts[1:]
-        for part in parts:
-            labels.append(part.strip())
-        if not word_label_map.has_key(word):
-            word_label_map[word] = labels
-        else:
-            word_label_map[word] += labels
-    return word_label_map
 
 
 def get_background_index(back_path):
@@ -281,46 +245,12 @@ def choose_best_label(word_label_map, common_words):
     return best_label
 
 
-def choose_sub_topic_best_label(topic_words_A, topic_words_B, word_label_map, label_thresh):
-    label_count_map_A = dict()
-    label_count_map_B = dict()
-    for word in topic_words_A:
-        labels = word_label_map[word]
-        for label in labels:
-            if label_count_map_A.has_key(label):
-                label_count_map_A[label] += 1
-            else:
-                label_count_map_A[label] = 1
-    max_count = 0
-    best_label_A = ""
-    total_count = 0
-    for label in label_count_map_A:
-        total_count += label_count_map_A[label]
-        if label_count_map_A[label] > max_count:
-            max_count = label_count_map_A[label]
-            best_label_A = label
-    if max_count < total_count / label_thresh:
-        best_label_A = "NONE"
-    
-    best_label_B = ""
-    for word in topic_words_B:
-        labels = word_label_map[word]
-        for label in labels:
-            if label_count_map_B.has_key(label):
-                label_count_map_B[label] += 1
-            else:
-                label_count_map_B[label] = 1
-    
-    max_count = 0
-    total_count = 0
-    best_label_B = ""
-    for label in label_count_map_B:
-        total_count += label_count_map_B[label]
-        if label_count_map_B[label] > max_count:
-            max_count = label_count_map_B[label]
-            best_label_B = label
-    if max_count < total_count / label_thresh:
-        best_label_B = "NONE"
+def choose_common_label(topic_words_A, topic_words_B, word_label_map, label_thresh):
+    """
+    选择两个子话题之间的共同label
+    """
+    best_label_A = ex.choose_sub_topic_best_label(topic_words_A, word_label_map, label_thresh)
+    best_label_B = ex.choose_sub_topic_best_label(topic_words_B, word_label_map, label_thresh)
 
     if best_label_A == best_label_B:
         return best_label_A
@@ -347,7 +277,7 @@ def event_in_common(word_label_map, back_index, corpus_path, event_A, event_B, d
             if best_label == "NONE":
                 continue
             """
-            best_label = choose_sub_topic_best_label(event_A[i], event_B[j], word_label_map, label_thresh)
+            best_label = choose_common_label(event_A[i], event_B[j], word_label_map, label_thresh)
             if best_label == "NONE":
                 continue
             print 
@@ -364,7 +294,7 @@ def events_analysis(filenames, total_corpus_path, df_path,
                     back_path, label_path, min_len, rate, label_thresh):
     key_set = set()
     back_index = get_background_index(back_path)
-    word_label_map = load_word_label_map(label_path)
+    word_label_map = ex.load_word_label_map(label_path)
     df_map = load_df_map(df_path)
     for i in range(len(filenames)):
         for j in range(len(filenames)):
