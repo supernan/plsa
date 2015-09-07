@@ -10,10 +10,10 @@ from matplotlib.pyplot import plot,savefig
 
 cutlist = "。！？".decode("utf-8")
 
-corpus_path = "/home/zhounan/corpus/mongo_data/news_event/tianjin/tianjin" #要扫描的语料路径
-topic_words_path = "/home/zhounan/project/ict/plsa/plsa/data/tianjin_explosion/topic_words" #主题模型生产的话题词
-label_path="../data/tianjin_explosion/labels"
-filename = "tianjin_explosion"
+corpus_path = "/home/zhounan/corpus/mongo_data/news_event/zibo_explosion_hour" #要扫描的语料路径
+topic_words_path = "/home/zhounan/project/ict/plsa/plsa/data/zibo_explosion/topic_words" #主题模型生产的话题词
+label_path="../data/zibo_explosion/labels"
+filename = "zibo_explosion"
 min_keys = 2 #句子中包含的最小关键词个数, 大于此值才统计关键词的共现情况
 tf_thresh = 5 #话题词共现的阈值
 min_len = 3 #话题词的最小长度
@@ -38,18 +38,6 @@ def load_word_label_map(path):
         else:
             word_label_map[word] += labels
     return word_label_map
-
-
-def load_label_flg_map(path):
-    """
-    标注子话题label是事件子事件还是事件的属性
-    """
-    label_map = dict()
-    f = open(path)
-    for line in f:
-        parts = line.strip().split("||")
-        label_map[parts[0]] = parts[1]
-    return label_map
 
 
 def generate_snips(line, words):
@@ -86,37 +74,34 @@ def generate_cluster_time(path, topic_words, rate):
         text_clusters[i] = []
     for i in range(len(topic_words)):
         topic_count_map[i] = dict()
-        max_time_dict[i] = "0000-00-00"
-        min_time_dict[i] = "8888-00-00"
+    
     for line in f:
         for topic_id in range(len(topic_words)):
             words = topic_words[topic_id]
-            time_list = []
             if wc.key_words_match(line.strip(), words, rate):
-		time_str = extract_time(line)
-                time_list.append(time_str)
+		time = extract_time(line)
+                if topic_count_map[topic_id].has_key(time):
+                    topic_count_map[topic_id][time] += 1
+                else:
+                    topic_count_map[topic_id][time] = 1
                 if text_clusters.has_key(topic_id):
                     text_clusters[topic_id].append(line.strip())
                 else:
                     text_clusters[topic_id] = []
                     text_clusters[topic_id].append(line.strip())
-            sorted_list = sorted(time_list)
-
-            if len(sorted_list) == 0:
-                continue
-            else:
-                max_time = sorted_list[len(sorted_list) - 1]
-                min_time = sorted_list[0]
-                if topic_count_map[topic_id].has_key(min_time):
-                    topic_count_map[topic_id][min_time] += 1
-                else:
-                    topic_count_map[topic_id][min_time] = 1
-                if max_time_dict[topic_id] <= max_time:
-                    max_time_dict[topic_id] = max_time
-                if min_time_dict[topic_id] >= min_time:
-                    min_time_dict[topic_id] = min_time
     
+    for tid in topic_count_map:
+        time_count_map = topic_count_map[tid]
+        time_list = sorted(time_count_map.items(), key=lambda d: d[0])
+        if len(time_list) == 0:
+            continue
+        min_time = time_list[0][0]
+        max_time = time_list[len(time_list) - 1][0]
+        max_time_dict[tid] = max_time
+        min_time_dict[tid] = min_time
+
     return text_clusters, topic_count_map, max_time_dict,  min_time_dict
+
 
 
 def choose_sub_topic_best_label(topic_words, word_label_map, label_thresh):
@@ -124,6 +109,7 @@ def choose_sub_topic_best_label(topic_words, word_label_map, label_thresh):
     选择子话题label
     """
     label_count_map = dict()
+    best_label = "NONE"
     for word in topic_words:
         if not word_label_map.has_key(word):
             continue
@@ -134,7 +120,6 @@ def choose_sub_topic_best_label(topic_words, word_label_map, label_thresh):
             else:
                 label_count_map[label] = 1
     max_count = 0
-    best_label = ""
     total_count = 0
     for label in label_count_map:
         total_count += label_count_map[label]
@@ -169,6 +154,9 @@ def generate_cluster(path, topic_words):
 
 
 def set_step(x, y, step, size):
+    """
+    根据step调整数据
+    """
     step *= 3600
     num = int(size / step) + 1
     ret_x = []
@@ -182,14 +170,22 @@ def set_step(x, y, step, size):
 
 
 def str2datetime(day, time_format='%Y-%m-%d %H'):
+    """
+    字符串转化成datetime对象
+    """
     return datetime.datetime.fromtimestamp(time.mktime(time.strptime(day, time_format)))
 
 
 def draw_graph(topic_count_map, topic_label_map, gap, filename):
+    """
+    绘制子话题热度折线图
+    """
     font = FontProperties(fname=r"/home/zhounan/fonts/yahei.ttf", size=10)
     count = 1
     size = len(topic_count_map)
     for tid in topic_count_map:
+        if len(topic_count_map[tid]) == 0:
+            continue
         if topic_label_map[tid] == "NONE":
             continue
         time_count_map = topic_count_map[tid]
@@ -215,23 +211,55 @@ def draw_graph(topic_count_map, topic_label_map, gap, filename):
     plt.close() 
 
 
+def generate_flow_chart(topic_label_map, min_time_dict):
+    label_time_map = dict()
+    time_label_map = dict()
+    for tid in topic_label_map:
+        if topic_label_map[tid] == "NONE":
+            continue
+        if not min_time_dict.has_key(tid):
+            continue
+        label = topic_label_map[tid]
+        if label_time_map.has_key(label):
+            label_time_map[label].append(min_time_dict[tid])
+        else:
+            label_time_map[label] = []
+            label_time_map[label].append(min_time_dict[tid])
+    for label in label_time_map:
+        time_list = label_time_map[label]
+        sorted_time_list = sorted(time_list)
+        time = sorted_time_list[0]
+        if time_label_map.has_key(time):
+            time_label_map[time].append(label)
+        else:
+            time_label_map[time] = []
+            time_label_map[time].append(label)
+    sorted_time = sorted(time_label_map.items(), key=lambda d: d[0])
+    for time_tuple in sorted_time:
+        key = time_tuple[0]
+        labels = time_tuple[1]
+        print key, ','.join(labels)
+        
+        
+
 
 
 if __name__ == '__main__':
     topic_words = wc.topic_words_discocery(topic_words_path, corpus_path, tf_thresh, min_len)
     word_label_map = load_word_label_map(label_path)
-    #label_map = load_label_flg_map(label_flg_path)
     text_clusters, topic_count_map, max_time_dict, min_time_dict = generate_cluster_time(corpus_path, topic_words, 1)
     topic_label_map = dict()
     for tid in topic_words:
         label = choose_sub_topic_best_label(topic_words[tid], word_label_map, 2)
         topic_label_map[tid] = label
-        if label == "NONE":
+        if label == "NONE" or len(text_clusters[tid]) == 0:
             continue
-        print ','.join(topic_words[tid]), min_time_dict[tid], max_time_dict[tid], '[', label.strip(), ']'#, label_map[label]
-    draw_graph(topic_count_map, topic_label_map, 1, filename)
-    draw_graph(topic_count_map, topic_label_map, 2, filename)
-    draw_graph(topic_count_map, topic_label_map, 5, filename)
+        print ','.join(topic_words[tid]), min_time_dict[tid], max_time_dict[tid], '[', label.strip(), ']'
+    print
+    generate_flow_chart(topic_label_map, min_time_dict)
+    #draw_graph(topic_count_map, topic_label_map, 1, filename)
+    #draw_graph(topic_count_map, topic_label_map, 2, filename)
+    #draw_graph(topic_count_map, topic_label_map, 5, filename)
     """
     for cid in text_clusters:
         f = open("./cluster/sample/" + str(cid), 'w')
